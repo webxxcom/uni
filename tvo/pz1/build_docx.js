@@ -42,8 +42,9 @@ const P = (text, opts = {}) => new Paragraph({
   keepNext: opts.keepNext,
 });
 const F = (text) => P(text, { align: AlignmentType.CENTER, noIndent: true }); // displayed formula
-const H1 = (text, pageBreak = false) => new Paragraph({ heading: HeadingLevel.HEADING_1, children: runs(text), pageBreakBefore: pageBreak });
-const H2 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: runs(text) });
+// Heading 1 = «ЗВІТ» on the title page, Heading 2 = sections, Heading 3 = subsections.
+const H1 = (text, pageBreak = false) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: runs(text), pageBreakBefore: pageBreak });
+const H2 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_3, children: runs(text) });
 const TCAP = (text) => new Paragraph({ children: runs(text), spacing: { before: 120, after: 60 }, keepNext: true });
 const FCAP = (text) => new Paragraph({ children: runs(text), alignment: AlignmentType.CENTER, spacing: { before: 60, after: 120 } });
 
@@ -91,7 +92,7 @@ const title = [
   ...blank(1),
   C('Кафедра системотехніки'),
   ...blank(6),
-  new Paragraph({ alignment: AlignmentType.CENTER, spacing: LINE, children: runs('ЗВІТ', { bold: true, size: 32 }) }),
+  new Paragraph({ heading: HeadingLevel.HEADING_1, children: runs('ЗВІТ') }),
   C('з практичного заняття №1'),
   C('з дисципліни «Технології високопродуктивних обчислень»'),
   C('на тему: «Аналіз трудомісткості паралельних обчислень»'),
@@ -221,11 +222,14 @@ const doc = new Document({
     default: { document: { run: { font: FONT, size: SIZE } } },
     paragraphStyles: [
       { id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true,
-        run: { font: FONT, size: SIZE, bold: true, color: '000000', allCaps: true },
-        paragraph: { alignment: AlignmentType.CENTER, spacing: { before: 240, after: 240, ...LINE }, keepNext: true, outlineLevel: 0 } },
+        run: { font: FONT, size: 32, bold: true, color: '000000' },
+        paragraph: { alignment: AlignmentType.CENTER, spacing: { before: 0, after: 0, ...LINE }, keepNext: true, outlineLevel: 0 } },
       { id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true,
+        run: { font: FONT, size: SIZE, bold: true, color: '000000', allCaps: true },
+        paragraph: { alignment: AlignmentType.CENTER, spacing: { before: 240, after: 240, ...LINE }, keepNext: true, outlineLevel: 1 } },
+      { id: 'Heading3', name: 'Heading 3', basedOn: 'Normal', next: 'Normal', quickFormat: true,
         run: { font: FONT, size: SIZE, bold: true, color: '000000' },
-        paragraph: { indent: { firstLine: INDENT }, spacing: { before: 240, after: 120, ...LINE }, keepNext: true, outlineLevel: 1 } },
+        paragraph: { indent: { firstLine: INDENT }, spacing: { before: 240, after: 120, ...LINE }, keepNext: true, outlineLevel: 2 } },
     ],
   },
   sections: [{
