@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  XSD-схема даних розподіленого застосування «Car Rental» (сервіс оренди автомобілів).
+  Дані передаються між трьома підсистемами:
+    Fleet Service    – моделі та автомобілі автопарку (cr:fleet);
+    Customer Service – клієнти (cr:customers);
+    Rental Service   – оренди з додатковими послугами та оплатою (cr:rentals).
+  Сутності: CarModel, Car, Customer, Rental, RentalExtra, Payment.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:cr="http://nure.ua/knt-23-1/kravchenko/car-rental"
+            targetNamespace="http://nure.ua/knt-23-1/kravchenko/car-rental"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <!-- ===================== Кореневий елемент ===================== -->
+    <xsd:element name="carRental" type="cr:CarRentalType">
+        <!-- Ідентифікатори моделей, клієнтів та оренд мають бути унікальними,
+             а посилання оренди – вказувати на існуючі автомобіль і клієнта. -->
+        <xsd:key name="carModelKey">
+            <xsd:selector xpath="cr:fleet/cr:carModel"/>
+            <xsd:field xpath="@id"/>
+        </xsd:key>
+        <xsd:key name="carKey">
+            <xsd:selector xpath="cr:fleet/cr:carModel/cr:car"/>
+            <xsd:field xpath="@plateNumber"/>
+        </xsd:key>
+        <xsd:key name="customerKey">
+            <xsd:selector xpath="cr:customers/cr:customer"/>
+            <xsd:field xpath="@id"/>
+        </xsd:key>
+        <xsd:unique name="rentalIdUnique">
+            <xsd:selector xpath="cr:rentals/cr:rental"/>
+            <xsd:field xpath="@id"/>
+        </xsd:unique>
+        <xsd:keyref name="rentalCarRef" refer="cr:carKey">
+            <xsd:selector xpath="cr:rentals/cr:rental"/>
+            <xsd:field xpath="@carPlate"/>
+        </xsd:keyref>
+        <xsd:keyref name="rentalCustomerRef" refer="cr:customerKey">
+            <xsd:selector xpath="cr:rentals/cr:rental"/>
+            <xsd:field xpath="@customerId"/>
+        </xsd:keyref>
+    </xsd:element>
+
+    <xsd:complexType name="CarRentalType">
+        <xsd:sequence>
+            <xsd:element name="fleet" type="cr:FleetType"/>
+            <xsd:element name="customers" type="cr:CustomersType"/>
+            <xsd:element name="rentals" type="cr:RentalsType"/>
+        </xsd:sequence>
+        <!-- Обов'язковий атрибут з обмеженням: дата формування документа не раніше 2024 р. -->
+        <xsd:attribute name="generatedAt" use="required">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:dateTime">
+                    <xsd:minInclusive value="2024-01-01T00:00:00"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <!-- Необов'язковий атрибут з обмеженням (перелік): відправник документа. -->
+        <xsd:attribute name="source" use="optional" default="RENTAL_SERVICE">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="FLEET_SERVICE"/>
+                    <xsd:enumeration value="CUSTOMER_SERVICE"/>
+                    <xsd:enumeration value="RENTAL_SERVICE"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <!-- ===================== Fleet Service ===================== -->
+    <xsd:complexType name="FleetType">
+        <xsd:sequence>
+            <xsd:element name="carModel" type="cr:CarModelType" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- Модель автомобіля: компоненти у фіксованому порядку (sequence). -->
+    <xsd:complexType name="CarModelType">
+        <xsd:sequence>
+            <!-- Елементи без restriction: використовується вбудований тип напряму. -->
+            <xsd:element name="brand" type="xsd:string"/>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="year" type="cr:ModelYearType"/>
+            <xsd:element name="engineType" type="cr:EngineTypeEnum"/>
+            <xsd:element name="transmission" type="cr:TransmissionEnum"/>
+            <xsd:element name="seats" type="cr:SeatsType"/>
+            <xsd:element name="dailyRate" type="cr:MoneyType"/>
+            <xsd:element name="description" minOccurs="0" maxOccurs="1">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:minLength value="10"/>
+                        <xsd:maxLength value="300"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="car" type="cr:CarType" minOccurs="0" maxOccurs="50"/>
+        </xsd:sequence>
+        <xsd:attribute name="id" type="cr:ModelIdType" use="required"/>
+    </xsd:complexType>
+
+    <!-- Автомобіль: порядок дочірніх елементів довільний (all). -->
+    <xsd:complexType name="CarType">
+        <xsd:all>
+            <xsd:element name="color" type="xsd:string"/>
+            <xsd:element name="mileage" type="cr:MileageType"/>
+            <xsd:element name="status" type="cr:CarStatusEnum"/>
+            <xsd:element name="lastServiceDate" type="xsd:date" minOccurs="0"/>
+        </xsd:all>
+        <xsd:attribute name="plateNumber" type="cr:PlateNumberType" use="required"/>
+    </xsd:complexType>
+
+    <!-- ===================== Customer Service ===================== -->
+    <xsd:complexType name="CustomersType">
+        <xsd:sequence>
+            <xsd:element name="customer" type="cr:CustomerType" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="CustomerType">
+        <xsd:sequence>
+            <xsd:element name="firstName" type="cr:PersonNameType"/>
+            <xsd:element name="lastName" type="cr:PersonNameType"/>
+            <xsd:element name="phoneNumber" type="cr:PhoneType"/>
+            <xsd:element name="email" type="cr:EmailType" minOccurs="0"/>
+            <xsd:element name="birthDate" type="cr:BirthDateType"/>
+            <xsd:element name="driverLicense" type="cr:DriverLicenseType"/>
+        </xsd:sequence>
+        <xsd:attribute name="id" type="cr:CustomerIdType" use="required"/>
+        <!-- Необов'язковий атрибут з обмеженням: персональна знижка 0..30 %. -->
+        <xsd:attribute name="discountPercent" use="optional">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:nonNegativeInteger">
+                    <xsd:maxInclusive value="30"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <!-- ===================== Rental Service ===================== -->
+    <xsd:complexType name="RentalsType">
+        <xsd:sequence>
+            <xsd:element name="rental" type="cr:RentalType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="RentalType">
+        <xsd:sequence>
+            <xsd:element name="startDate" type="xsd:date"/>
+            <xsd:element name="endDate" type="xsd:date"/>
+            <xsd:element name="dailyRate" type="cr:MoneyType"/>
+            <xsd:element name="extras" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="extra" type="cr:RentalExtraType" minOccurs="1" maxOccurs="5"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="totalCost" type="cr:MoneyType"/>
+            <xsd:element name="status" type="cr:RentalStatusEnum"/>
+            <xsd:element name="payment" type="cr:PaymentType"/>
+        </xsd:sequence>
+        <xsd:attribute name="id" type="cr:RentalIdType" use="required"/>
+        <xsd:attribute name="customerId" type="cr:CustomerIdType" use="required"/>
+        <xsd:attribute name="carPlate" type="cr:PlateNumberType" use="required"/>
+    </xsd:complexType>
+
+    <!-- Додаткова послуга (дитяче крісло, GPS, повна страховка тощо). -->
+    <xsd:complexType name="RentalExtraType">
+        <xsd:simpleContent>
+            <xsd:extension base="cr:ExtraNameType">
+                <xsd:attribute name="price" type="cr:ExtraPriceType" use="required"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <!-- Оплата: рівно один із трьох варіантів (choice). -->
+    <xsd:complexType name="PaymentType">
+        <xsd:choice>
+            <xsd:element name="card">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="maskedNumber" type="cr:MaskedCardType"/>
+                        <xsd:element name="paidAt" type="xsd:dateTime"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="cash">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="receiptNumber" type="cr:ReceiptNumberType"/>
+                        <xsd:element name="paidAt" type="xsd:dateTime"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="pending">
+                <xsd:complexType>
+                    <xsd:attribute name="dueDate" type="xsd:date" use="required"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <!-- ===================== Прості типи ===================== -->
+    <xsd:simpleType name="ModelIdType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="M[0-9]{3}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="CustomerIdType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="C[0-9]{4}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="RentalIdType">
+        <xsd:restriction base="xsd:positiveInteger">
+            <xsd:totalDigits value="6"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!-- Український номерний знак: 2 літери, 4 цифри, 2 літери, напр. AX1234BC (рівно 8 символів). -->
+    <xsd:simpleType name="PlateNumberType">
+        <xsd:restriction base="xsd:string">
+            <xsd:length value="8"/>
+            <xsd:pattern value="[ABCEHIKMOPTX]{2}[0-9]{4}[ABCEHIKMOPTX]{2}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!-- Рік моделі: від 2000 (включно) до 2028 (не включно). -->
+    <xsd:simpleType name="ModelYearType">
+        <xsd:restriction base="xsd:gYear">
+            <xsd:minInclusive value="2000"/>
+            <xsd:maxExclusive value="2028"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="SeatsType">
+        <xsd:restriction base="xsd:unsignedByte">
+            <xsd:minInclusive value="2"/>
+            <xsd:maxInclusive value="9"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!-- Грошова сума: більше 0, до 99999.99 (7 цифр, 2 після коми). -->
+    <xsd:simpleType name="MoneyType">
+        <xsd:restriction base="xsd:decimal">
+            <xsd:minExclusive value="0"/>
+            <xsd:totalDigits value="7"/>
+            <xsd:fractionDigits value="2"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="ExtraPriceType">
+        <xsd:restriction base="cr:MoneyType">
+            <xsd:maxExclusive value="1000"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="MileageType">
+        <xsd:restriction base="xsd:nonNegativeInteger">
+            <xsd:maxInclusive value="999999"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="PersonNameType">
+        <xsd:restriction base="xsd:token">
+            <xsd:minLength value="1"/>
+            <xsd:maxLength value="50"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="PhoneType">
+        <xsd:restriction base="xsd:string">
+            <xsd:length value="10"/>
+            <xsd:pattern value="0[0-9]{9}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="EmailType">
+        <xsd:restriction base="xsd:string">
+            <xsd:maxLength value="100"/>
+            <xsd:pattern value="[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!-- Клієнт має бути повнолітнім: дата народження не пізніше 2008-10-13. -->
+    <xsd:simpleType name="BirthDateType">
+        <xsd:restriction base="xsd:date">
+            <xsd:minInclusive value="1930-01-01"/>
+            <xsd:maxInclusive value="2008-10-13"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!-- Посвідчення водія України: 3 літери + 6 цифр, напр. AXA123456. -->
+    <xsd:simpleType name="DriverLicenseType">
+        <xsd:restriction base="xsd:string">
+            <xsd:length value="9"/>
+            <xsd:pattern value="[A-Z]{3}[0-9]{6}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="MaskedCardType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="\*{4} \*{4} \*{4} [0-9]{4}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="ReceiptNumberType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="RC-[0-9]{6}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="ExtraNameType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="CHILD_SEAT"/>
+            <xsd:enumeration value="GPS"/>
+            <xsd:enumeration value="FULL_INSURANCE"/>
+            <xsd:enumeration value="ADDITIONAL_DRIVER"/>
+            <xsd:enumeration value="SNOW_CHAINS"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!-- ===================== Переліки (enumeration) ===================== -->
+    <xsd:simpleType name="EngineTypeEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="PETROL"/>
+            <xsd:enumeration value="DIESEL"/>
+            <xsd:enumeration value="ELECTRIC"/>
+            <xsd:enumeration value="HYBRID"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="TransmissionEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="MANUAL"/>
+            <xsd:enumeration value="AUTOMATIC"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="CarStatusEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="AVAILABLE"/>
+            <xsd:enumeration value="RENTED"/>
+            <xsd:enumeration value="MAINTENANCE"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="RentalStatusEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="BOOKED"/>
+            <xsd:enumeration value="ACTIVE"/>
+            <xsd:enumeration value="COMPLETED"/>
+            <xsd:enumeration value="CANCELLED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

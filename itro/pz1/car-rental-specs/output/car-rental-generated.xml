@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<car:carRental generatedAt="2010-09-28T16:39:22.000" source="RENTAL_SERVICE" xmlns:car="http://nure.ua/knt-23-1/kravchenko/car-rental">
+  <car:fleet>
+    <!--1 or more repetitions:-->
+    <car:carModel id="string">
+      <car:brand>string</car:brand>
+      <car:name>string</car:name>
+      <car:year>2000</car:year>
+      <car:engineType>ELECTRIC</car:engineType>
+      <car:transmission>MANUAL</car:transmission>
+      <car:seats>6</car:seats>
+      <car:dailyRate>1000.000</car:dailyRate>
+      <!--Optional:-->
+      <car:description>stringstring</car:description>
+      <!--0 to 50 repetitions:-->
+      <car:car plateNumber="stringst">
+        <car:color>string</car:color>
+        <car:mileage>200</car:mileage>
+        <car:status>RENTED</car:status>
+        <!--Optional:-->
+        <car:lastServiceDate>2018-05-19</car:lastServiceDate>
+      </car:car>
+    </car:carModel>
+  </car:fleet>
+  <car:customers>
+    <!--1 or more repetitions:-->
+    <car:customer id="string" discountPercent="30">
+      <car:firstName>token</car:firstName>
+      <car:lastName>token</car:lastName>
+      <car:phoneNumber>stringstri</car:phoneNumber>
+      <!--Optional:-->
+      <car:email>string</car:email>
+      <car:birthDate>1930-01-01</car:birthDate>
+      <car:driverLicense>stringstr</car:driverLicense>
+    </car:customer>
+  </car:customers>
+  <car:rentals>
+    <!--Zero or more repetitions:-->
+    <car:rental id="201" customerId="string" carPlate="stringst">
+      <car:startDate>2016-06-27+02:00</car:startDate>
+      <car:endDate>2017-01-24</car:endDate>
+      <car:dailyRate>1000.000</car:dailyRate>
+      <!--Optional:-->
+      <car:extras>
+        <!--1 to 5 repetitions:-->
+        <car:extra price="999.9900">GPS</car:extra>
+      </car:extras>
+      <car:totalCost>1000.000</car:totalCost>
+      <car:status>ACTIVE</car:status>
+      <car:payment>
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <car:card>
+          <car:maskedNumber>string</car:maskedNumber>
+          <car:paidAt>2006-04-20T13:56:01+02:00</car:paidAt>
+        </car:card>
+        <car:cash>
+          <car:receiptNumber>string</car:receiptNumber>
+          <car:paidAt>2007-02-26T10:47:18+01:00</car:paidAt>
+        </car:cash>
+        <car:pending dueDate="2002-08-06"/>
+      </car:payment>
+    </car:rental>
+  </car:rentals>
+</car:carRental>
