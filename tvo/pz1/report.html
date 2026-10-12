@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>ТВО ПЗ1 Кравченко</title>
+<style>
+  @page { size: A4; margin: 20mm 15mm 20mm 25mm; }
+  body { font-family: "Liberation Serif", "Times New Roman", serif; font-size: 14pt; line-height: 1.4; color: #000; background: #fff; }
+  .title { height: 250mm; display: flex; flex-direction: column; text-align: center; page-break-after: always; }
+  .title .top { font-weight: bold; }
+  .title .mid { margin-top: 55mm; }
+  .title .mid .big { font-size: 18pt; font-weight: bold; margin-bottom: 4mm; }
+  .title .people { margin-top: 35mm; display: flex; justify-content: space-between; text-align: left; }
+  .title .bottom { margin-top: auto; }
+  h1 { font-size: 15pt; text-align: center; margin: 0 0 4mm; }
+  h2 { font-size: 14pt; margin: 6mm 0 2mm; break-after: avoid; page-break-after: avoid; }
+  p { margin: 0 0 2mm; text-align: justify; text-indent: 12mm; }
+  p.ni { text-indent: 0; }
+  .formula { text-align: center; margin: 3mm 0; font-style: italic; }
+  table { border-collapse: collapse; margin: 3mm auto; font-size: 12pt; page-break-inside: avoid; break-inside: avoid; }
+  th, td { border: 1px solid #000; padding: 1.5mm 3mm; text-align: center; }
+  th { font-weight: bold; }
+  td.l { text-align: left; }
+  .caption { text-align: center; font-size: 12pt; margin-bottom: 4mm; }
+  figure { margin: 3mm 0; text-align: center; page-break-inside: avoid; }
+  .tbl { break-inside: avoid; page-break-inside: avoid; }
+  .break { page-break-before: always; }
+  ul { margin: 0 0 2mm; }
+</style>
+</head>
+<body>
+
+<div class="title">
+  <div class="top">
+    МІНІСТЕРСТВО ОСВІТИ І НАУКИ УКРАЇНИ<br>
+    ХАРКІВСЬКИЙ НАЦІОНАЛЬНИЙ УНІВЕРСИТЕТ РАДІОЕЛЕКТРОНІКИ
+  </div>
+  <div style="margin-top:6mm">Кафедра системотехніки</div>
+  <div class="mid">
+    <div class="big">ЗВІТ</div>
+    з практичного заняття №1<br>
+    з дисципліни «Технології високопродуктивних обчислень»<br>
+    на тему: «Аналіз трудомісткості паралельних обчислень»<br>
+    Варіант 9
+  </div>
+  <div class="people">
+    <div>Виконав:<br>ст. гр. КНТ-23-1<br>Кравченко Р.</div>
+    <div>Перевірив:<br>проф. каф. СТ<br>Міщеряков Ю.В.</div>
+  </div>
+  <div class="bottom">Харків 2026</div>
+</div>
+
+<h1>1 МЕТА РОБОТИ</h1>
+<p>Оволодіння основними навичками аналізу трудомісткості паралельних обчислень на простих арифметичних прикладах, визначення основних характеристик трудомісткості та їх залежності від схеми обчислень та кількості процесорів. Отримання досвіду оцінки трудомісткості паралельних обчислень за допомогою основних теорем.</p>
+
+<h1 style="margin-top:6mm">2 ЗАВДАННЯ</h1>
+<p>Для виразу варіанта 9 побудувати граф «операції-операнди», розрахувати послідовний час виконання <i>T</i><sub>1</sub> та мінімально досяжний час виконання на паракомп’ютері <i>T</i><sub>∞</sub>, розрахувати прискорення, ефективність та вартість; згідно з теоремою 5 визначити оптимальну кількість процесорів; побудувати розклади виконання для <i>p</i> ≥ <i>T</i><sub>1</sub>/<i>T</i><sub>∞</sub> та <i>p</i> &lt; <i>T</i><sub>1</sub>/<i>T</i><sub>∞</sub> та розрахувати для них прискорення, ефективність і вартість.</p>
+<p class="ni">Вираз (варіант 9):</p>
+<div class="formula">
+  <svg width="420" height="60" viewBox="0 0 420 60" font-family="Liberation Serif, serif" font-size="20" font-style="italic">
+    <text x="40" y="22" text-anchor="middle">4</text>
+    <line x1="5" y1="30" x2="75" y2="30" stroke="#000"/>
+    <text x="40" y="52" text-anchor="middle">49a² − 1</text>
+    <text x="95" y="37" text-anchor="middle">+</text>
+    <text x="160" y="22" text-anchor="middle">1 + 7a</text>
+    <line x1="120" y1="30" x2="200" y2="30" stroke="#000"/>
+    <text x="160" y="52" text-anchor="middle">1 − 7a</text>
+    <text x="222" y="37" text-anchor="middle">−</text>
+    <text x="285" y="22" text-anchor="middle">1 − 7a</text>
+    <line x1="245" y1="30" x2="325" y2="30" stroke="#000"/>
+    <text x="285" y="52" text-anchor="middle">1 + 7a</text>
+  </svg>
+</div>
+<p>Модель обчислень: час виконання будь-якої арифметичної операції дорівнює 1, передача даних між процесорами відбувається миттєво.</p>
+
+<h1 style="margin-top:6mm">3 ХІД ВИКОНАННЯ РОБОТИ</h1>
+
+<h2>3.1 Схема обчислень</h2>
+<p>Вираз обчислюється без попереднього спрощення. Для зменшення кількості операцій значення 49<i>a</i>² отримується як добуток (7<i>a</i>)·(7<i>a</i>), тобто використовує вже обчислене 7<i>a</i>. Останні дві дії виконуються у порядку <i>A</i> + (<i>B</i> − <i>C</i>), що допустимо, бо додавання та віднімання асоціативні; це дозволяє обчислювати <i>B</i> − <i>C</i> паралельно з <i>A</i> і скорочує критичний шлях на одну операцію порівняно з обчисленням зліва направо ((<i>A</i> + <i>B</i>) − <i>C</i>).</p>
+
+<div class="tbl"><table>
+  <tr><th>№</th><th>Операція</th><th>Результат</th><th>Залежить від</th><th>Рівень</th></tr>
+  <tr><td>1</td><td>7 · <i>a</i></td><td>7<i>a</i></td><td>вхідні дані</td><td>1</td></tr>
+  <tr><td>2</td><td>(1) · (1)</td><td>49<i>a</i>²</td><td>1</td><td>2</td></tr>
+  <tr><td>3</td><td>1 + (1)</td><td>1 + 7<i>a</i></td><td>1</td><td>2</td></tr>
+  <tr><td>4</td><td>1 − (1)</td><td>1 − 7<i>a</i></td><td>1</td><td>2</td></tr>
+  <tr><td>5</td><td>(2) − 1</td><td>49<i>a</i>² − 1</td><td>2</td><td>3</td></tr>
+  <tr><td>6</td><td>(3) ÷ (4)</td><td>(1 + 7<i>a</i>)/(1 − 7<i>a</i>)</td><td>3, 4</td><td>3</td></tr>
+  <tr><td>7</td><td>(4) ÷ (3)</td><td>(1 − 7<i>a</i>)/(1 + 7<i>a</i>)</td><td>3, 4</td><td>3</td></tr>
+  <tr><td>8</td><td>4 ÷ (5)</td><td>4/(49<i>a</i>² − 1)</td><td>5</td><td>4</td></tr>
+  <tr><td>9</td><td>(6) − (7)</td><td><i>B</i> − <i>C</i></td><td>6, 7</td><td>4</td></tr>
+  <tr><td>10</td><td>(8) + (9)</td><td>результат</td><td>8, 9</td><td>5</td></tr>
+</table>
+<div class="caption">Таблиця 3.1 – Операції алгоритму</div></div>
+
+<figure>
+<h2 style="text-align:left">3.2 Граф «операції-операнди»</h2>
+<svg width="640" height="510" viewBox="0 0 640 510" font-family="Liberation Serif, serif" font-size="15">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#000"/>
+    </marker>
+  </defs>
+  <g stroke="#000" stroke-width="1.3" fill="none" marker-end="url(#ar)">
+    <!-- inputs to op1 -->
+    <line x1="200" y1="55" x2="232" y2="93"/>
+    <line x1="280" y1="55" x2="248" y2="93"/>
+    <!-- op1 to op2 (two operands) -->
+    <path d="M222,127 Q150,140 120,183"/>
+    <path d="M232,127 Q180,175 130,183"/>
+    <!-- op1 to op3, op4 -->
+    <line x1="250" y1="127" x2="295" y2="183"/>
+    <line x1="262" y1="127" x2="455" y2="183"/>
+    <!-- constants -->
+    <line x1="236" y1="171" x2="262" y2="186"/>
+    <line x1="545" y1="146" x2="500" y2="183"/>
+    <line x1="48" y1="246" x2="80" y2="273"/>
+    <line x1="48" y1="336" x2="80" y2="363"/>
+    <!-- level 2 to 3 -->
+    <line x1="110" y1="217" x2="110" y2="273"/>
+    <line x1="290" y1="217" x2="290" y2="273"/>
+    <line x1="315" y1="217" x2="460" y2="273"/>
+    <line x1="455" y1="217" x2="315" y2="273"/>
+    <line x1="480" y1="217" x2="480" y2="273"/>
+    <!-- level 3 to 4 -->
+    <line x1="110" y1="307" x2="110" y2="363"/>
+    <line x1="310" y1="307" x2="375" y2="363"/>
+    <line x1="470" y1="307" x2="400" y2="363"/>
+    <!-- level 4 to 5 -->
+    <line x1="130" y1="397" x2="240" y2="453"/>
+    <line x1="380" y1="397" x2="270" y2="453"/>
+  </g>
+  <!-- input nodes -->
+  <g fill="#fff" stroke="#000" stroke-width="1.3">
+    <rect x="185" y="25" width="30" height="30"/>
+    <rect x="265" y="25" width="30" height="30"/>
+    <rect x="218" y="151" width="22" height="22"/>
+    <rect x="543" y="128" width="22" height="22"/>
+    <rect x="28" y="228" width="22" height="22"/>
+    <rect x="28" y="318" width="22" height="22"/>
+  </g>
+  <g text-anchor="middle" font-style="italic">
+    <text x="200" y="45">a</text>
+    <text x="280" y="45">7</text>
+  </g>
+  <g text-anchor="middle" font-size="13">
+    <text x="229" y="167">1</text>
+    <text x="554" y="144">1</text>
+    <text x="39" y="244">1</text>
+    <text x="39" y="334">4</text>
+  </g>
+  <!-- op nodes -->
+  <g fill="#fff" stroke="#000" stroke-width="1.3">
+    <rect x="195" y="93" width="90" height="34" rx="12"/>
+    <rect x="65" y="183" width="100" height="34" rx="12"/>
+    <rect x="250" y="183" width="100" height="34" rx="12"/>
+    <rect x="425" y="183" width="100" height="34" rx="12"/>
+    <rect x="55" y="273" width="110" height="34" rx="12"/>
+    <rect x="245" y="273" width="110" height="34" rx="12"/>
+    <rect x="420" y="273" width="110" height="34" rx="12"/>
+    <rect x="55" y="363" width="110" height="34" rx="12"/>
+    <rect x="330" y="363" width="110" height="34" rx="12"/>
+    <rect x="195" y="453" width="120" height="34" rx="12"/>
+  </g>
+  <g text-anchor="middle">
+    <text x="240" y="115">1: 7·a</text>
+    <text x="115" y="205">2: 7a·7a</text>
+    <text x="300" y="205">3: 1+7a</text>
+    <text x="475" y="205">4: 1−7a</text>
+    <text x="110" y="295">5: 49a²−1</text>
+    <text x="300" y="295">6: (3)÷(4)</text>
+    <text x="475" y="295">7: (4)÷(3)</text>
+    <text x="110" y="385">8: 4÷(5)</text>
+    <text x="385" y="385">9: (6)−(7)</text>
+    <text x="255" y="475">10: (8)+(9)</text>
+  </g>
+  <g font-size="13" fill="#444">
+    <text x="575" y="115">рівень 1</text>
+    <text x="575" y="205">рівень 2</text>
+    <text x="575" y="295">рівень 3</text>
+    <text x="575" y="385">рівень 4</text>
+    <text x="575" y="475">рівень 5</text>
+  </g>
+</svg>
+<div class="caption">Рисунок 3.1 – Граф «операції-операнди» (квадрати – вхідні дані, заокруглені прямокутники – операції)</div>
+</figure>
+
+<h2>3.3 Час послідовного виконання та мінімальний час виконання</h2>
+<p>Алгоритм містить 10 операцій, кожна з яких виконується за одиницю часу, тому час виконання на одному процесорі:</p>
+<p class="formula"><i>T</i><sub>1</sub> = 10.</p>
+<p>За теоремою 1 мінімально можливий час виконання дорівнює довжині максимального (критичного) шляху графа. Критичний шлях: 1 → 2 → 5 → 8 → 10 (а також 1 → 3 → 6 → 9 → 10), його довжина дорівнює 5 операціям:</p>
+<p class="formula"><i>T</i><sub>∞</sub> = <i>d</i>(<i>G</i>) = 5.</p>
+
+<h2>3.4 Розклад для паракомп’ютера з максимальним рівнем паралелізму</h2>
+<p>Кожна операція виконується одразу, щойно готові її операнди (розклад за рівнями графа). Найбільша кількість операцій на одному рівні дорівнює 3 (рівні 2 і 3), тому <i>p</i> = 3.</p>
+<div class="tbl"><table>
+  <tr><th>Процесор \ такт</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+  <tr><td>P1</td><td>1</td><td>2</td><td>5</td><td>8</td><td>10</td></tr>
+  <tr><td>P2</td><td>–</td><td>3</td><td>6</td><td>9</td><td>–</td></tr>
+  <tr><td>P3</td><td>–</td><td>4</td><td>7</td><td>–</td><td>–</td></tr>
+</table>
+<div class="caption">Таблиця 3.2 – Розклад для <i>p</i> = 3</div></div>
+<p class="ni"><i>T</i><sub>1</sub> = 10, <i>p</i> = 3, <i>T</i><sub>3</sub> = 5;<br>
+<i>S</i><sub>3</sub> = <i>T</i><sub>1</sub>/<i>T</i><sub>3</sub> = 10/5 = 2;<br>
+<i>E</i><sub>3</sub> = <i>S</i><sub>3</sub>/<i>p</i> = 2/3 ≈ 0,667;<br>
+<i>C</i><sub>3</sub> = <i>T</i><sub>3</sub>·<i>p</i> = 5·3 = 15.</p>
+<p>Подальше збільшення кількості процесорів не зменшує час виконання, оскільки він уже дорівнює <i>T</i><sub>∞</sub>: наприклад, при <i>p</i> = 4 маємо <i>T</i><sub>4</sub> = 5, <i>S</i><sub>4</sub> = 2, <i>E</i><sub>4</sub> = 0,5, <i>C</i><sub>4</sub> = 20, тобто лише зростає вартість.</p>
+<p><i>p</i> = 3 – це також найменша кількість процесорів, за якої досягається час <i>T</i><sub>∞</sub> = 5: на першому такті готова лише операція 1, на п’ятому – лише операція 10, отже решта 8 операцій мають виконатися за такти 2–4, а для цього потрібно щонайменше ⌈8/3⌉ = 3 процесори. Тому серед розкладів з мінімальним часом виконання розклад з <i>p</i> = 3 має мінімальну вартість.</p>
+<p>Перевірка теореми 3: <i>T</i><sub>3</sub> = 5 &lt; <i>T</i><sub>∞</sub> + <i>T</i><sub>1</sub>/<i>p</i> = 5 + 10/3 ≈ 8,33 – виконується.</p>
+
+<h2>3.5 Оптимальна кількість процесорів за теоремою 5</h2>
+<p>За теоремою 5 час виконання, порівнянний з мінімально можливим, досягається при кількості процесорів</p>
+<p class="formula"><i>p</i> ≈ <i>T</i><sub>1</sub>/<i>T</i><sub>∞</sub> = 10/5 = 2,</p>
+<p>при цьому для <i>p</i> ≥ <i>T</i><sub>1</sub>/<i>T</i><sub>∞</sub> гарантується <i>T<sub>p</sub></i> ≤ 2·<i>T</i><sub>∞</sub> = 10.</p>
+
+<h2>3.6 Розклад для <i>p</i> ≥ <i>T</i><sub>1</sub>/<i>T</i><sub>∞</sub> (паракомп’ютер зі зменшеним рівнем паралелізму, <i>p</i> = 2)</h2>
+<div class="tbl"><table>
+  <tr><th>Процесор \ такт</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+  <tr><td>P1</td><td>1</td><td>2</td><td>4</td><td>6</td><td>8</td><td>10</td></tr>
+  <tr><td>P2</td><td>–</td><td>3</td><td>5</td><td>7</td><td>9</td><td>–</td></tr>
+</table>
+<div class="caption">Таблиця 3.3 – Розклад для <i>p</i> = 2</div></div>
+<p>Розклад коректний: кожна операція починається після завершення операцій, від яких вона залежить (операція 5 – після 2, операції 6 і 7 – після 3 і 4, операція 8 – після 5, операція 9 – після 6 і 7, операція 10 – після 8 і 9). Коротшого розкладу для двох процесорів не існує: на першому й останньому тактах може виконуватися лише по одній операції (1 і 10), а решта 8 операцій на двох процесорах займають щонайменше 4 такти, тобто <i>T</i><sub>2</sub> ≥ 1 + 4 + 1 = 6.</p>
+<p class="ni"><i>T</i><sub>1</sub> = 10, <i>p</i> = 2, <i>T</i><sub>2</sub> = 6;<br>
+<i>S</i><sub>2</sub> = 10/6 ≈ 1,667;<br>
+<i>E</i><sub>2</sub> = 1,667/2 ≈ 0,833;<br>
+<i>C</i><sub>2</sub> = 6·2 = 12.</p>
+<p>Перевірка теореми 5: <i>T</i><sub>2</sub> = 6 ≤ 2·<i>T</i><sub>∞</sub> = 10 – виконується. Перевірка теореми 3: 6 &lt; 5 + 10/2 = 10 – виконується.</p>
+
+<h2>3.7 Розклад для <i>p</i> &lt; <i>T</i><sub>1</sub>/<i>T</i><sub>∞</sub> (<i>p</i> = 1)</h2>
+<p>Єдина кількість процесорів, менша за <i>T</i><sub>1</sub>/<i>T</i><sub>∞</sub> = 2, – це <i>p</i> = 1, тобто послідовне виконання операцій у порядку 1, 2, 3, …, 10.</p>
+<div class="tbl"><table>
+  <tr><th>Процесор \ такт</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+  <tr><td>P1</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
+</table>
+<div class="caption">Таблиця 3.4 – Розклад для <i>p</i> = 1</div></div>
+<p class="ni"><i>T</i><sub>1</sub> = 10, <i>p</i> = 1, <i>T<sub>p</sub></i> = 10;<br>
+<i>S</i><sub>1</sub> = 1; <i>E</i><sub>1</sub> = 1; <i>C</i><sub>1</sub> = 10.</p>
+<p>Перевірка теореми 5: <i>T</i><sub>1</sub>/<i>p</i> = 10 ≤ <i>T<sub>p</sub></i> = 10 ≤ 2·<i>T</i><sub>1</sub>/<i>p</i> = 20 – виконується.</p>
+
+<div class="tbl">
+<h2 style="text-align:left">3.8 Порівняння розкладів</h2><table>
+  <tr><th><i>p</i></th><th><i>T<sub>p</sub></i></th><th><i>S<sub>p</sub></i></th><th><i>E<sub>p</sub></i></th><th><i>C<sub>p</sub></i></th><th>Примітка</th></tr>
+  <tr><td>1</td><td>10</td><td>1</td><td>1</td><td>10</td><td class="l">послідовне виконання</td></tr>
+  <tr><td>2</td><td>6</td><td>1,667</td><td>0,833</td><td>12</td><td class="l"><i>p</i> = <i>T</i><sub>1</sub>/<i>T</i><sub>∞</sub> (теорема 5)</td></tr>
+  <tr><td>3</td><td>5</td><td>2</td><td>0,667</td><td>15</td><td class="l">максимальний паралелізм, мінімальна вартість при <i>T<sub>p</sub></i> = <i>T</i><sub>∞</sub></td></tr>
+  <tr><td>4</td><td>5</td><td>2</td><td>0,5</td><td>20</td><td class="l">надлишкова кількість процесорів</td></tr>
+</table>
+<div class="caption">Таблиця 3.5 – Характеристики розкладів</div></div>
+
+<h1 style="margin-top:6mm">4 ВИСНОВКИ</h1>
+<p>У ході роботи для виразу варіанта 9 побудовано граф «операції-операнди», що містить 10 операцій та має критичний шлях довжиною 5, тобто <i>T</i><sub>1</sub> = 10, <i>T</i><sub>∞</sub> = 5. Порядок обчислення впливає на трудомісткість: використання 7<i>a</i>·7<i>a</i> замість окремого обчислення <i>a</i>² зменшило кількість операцій, а групування <i>A</i> + (<i>B</i> − <i>C</i>) скоротило критичний шлях з 6 до 5.</p>
+<p>Мінімальний час виконання <i>T</i><sub>∞</sub> = 5 досягається на 3 процесорах з прискоренням 2, ефективністю 0,667 та вартістю 15; менша кількість процесорів не дозволяє отримати такий час. За теоремою 5 оптимальна кількість процесорів дорівнює <i>T</i><sub>1</sub>/<i>T</i><sub>∞</sub> = 2: на двох процесорах час виконання 6 лише на один такт більший за мінімальний, а ефективність (0,833) вища і вартість (12) менша, ніж на трьох. Подальше збільшення кількості процесорів понад 3 не зменшує час, а лише знижує ефективність і підвищує вартість.</p>
+<p>Отже, зі зростанням кількості процесорів прискорення обмежене довжиною критичного шляху (<i>S<sub>p</sub></i> ≤ <i>T</i><sub>1</sub>/<i>T</i><sub>∞</sub> = 2), а ефективність монотонно спадає. Усі отримані розклади задовольняють оцінки теорем 1, 3 і 5.</p>
+<p>Також варто зазначити, що вираз можна спростити до −4/(7<i>a</i> + 1) (при <i>a</i> ≠ ±1/7), що потребує лише 3 послідовних операцій; тобто вибір алгоритму обчислення впливає на трудомісткість значно сильніше, ніж розпаралелювання заданої схеми.</p>
+
+</body>
+</html>
