@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PhotoGallery.ViewModels"
+             x:Class="PhotoGallery.Views.PhotoPage"
+             x:DataType="vm:PhotoViewModel"
+             Title="{Binding Photo.FileName}">
+
+    <Grid ColumnDefinitions="*,*" RowDefinitions="*" Padding="12" ColumnSpacing="12">
+        <!-- Ліва колонка: зображення та метадані -->
+        <ScrollView Grid.Column="0">
+            <VerticalStackLayout Spacing="8">
+                <Image Source="{Binding Photo.FilePath}" Aspect="AspectFit" HeightRequest="320" />
+
+                <TableView Intent="Data" HeightRequest="380">
+                    <TableRoot>
+                        <TableSection Title="Файл">
+                            <TextCell Text="Ім'я" Detail="{Binding Photo.FileName}" />
+                            <TextCell Text="Розмір" Detail="{Binding Photo.SizeText}" />
+                            <TextCell Text="Роздільна здатність" Detail="{Binding Photo.Resolution}" />
+                        </TableSection>
+                        <TableSection Title="EXIF">
+                            <TextCell Text="Камера" Detail="{Binding Photo.Camera, TargetNullValue='невідомо'}" />
+                            <TextCell Text="Дата зйомки" Detail="{Binding Photo.DateText}" />
+                            <TextCell Text="Координати (широта, довгота)" Detail="{Binding Photo.CoordinatesText}" />
+                            <TextCell Text="Висота, м" Detail="{Binding Photo.Altitude, StringFormat='{0:F1}', TargetNullValue='—'}" />
+                        </TableSection>
+                    </TableRoot>
+                </TableView>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Права колонка: місце зйомки -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" RowSpacing="8">
+            <Label Grid.Row="0" Text="Місце зйомки" FontAttributes="Bold" FontSize="18" />
+            <WebView Grid.Row="1" Source="{Binding MapSource}" IsVisible="{Binding Photo.HasLocation}" />
+            <Label Grid.Row="1" IsVisible="{Binding Photo.HasLocation, Converter={StaticResource InvertBool}}"
+                   Text="У цьому файлі немає GPS-координат. Камера або телефон не записали геолокацію (вимкнена в налаштуваннях камери, фото оброблене чи пересилалося через месенджер)."
+                   VerticalOptions="Center" HorizontalTextAlignment="Center" TextColor="Gray" />
+            <HorizontalStackLayout Grid.Row="2" Spacing="8" IsVisible="{Binding Photo.HasLocation}">
+                <Button Text="Відкрити в Картах" Command="{Binding OpenInMapsCommand}" />
+                <Button Text="Копіювати координати" Command="{Binding CopyCoordinatesCommand}" />
+            </HorizontalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

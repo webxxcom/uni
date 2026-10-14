@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PhotoGallery.ViewModels"
+             x:Class="PhotoGallery.Views.MainPage"
+             x:DataType="vm:MainViewModel"
+             Title="Фотогалерея">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Додати фото" Command="{Binding AddPhotosCommand}" />
+        <ToolbarItem Text="Очистити" Command="{Binding ClearCommand}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*">
+        <Label x:Name="EmptyLabel" Grid.Row="0" Margin="20" HorizontalTextAlignment="Center"
+               Text="Галерея порожня. Натисніть «Додати фото» та оберіть зображення (JPEG з телефона містить GPS-координати місця зйомки)." />
+        <ActivityIndicator Grid.Row="0" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HorizontalOptions="Center" />
+
+        <!-- Список фото — TableView: секції «З геолокацією» / «Без геолокації» будуються з ViewModel у MainPage.xaml.cs. -->
+        <TableView x:Name="Gallery" Grid.Row="1" Intent="Menu" HasUnevenRows="True" />
+    </Grid>
+</ContentPage>
