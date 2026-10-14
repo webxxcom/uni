@@ -108,7 +108,7 @@ def F(text):  # displayed formula
 
 
 def bullet(text):
-    return P('– ' + text)
+    return P('- ' + text)
 
 
 def H2(text, page_break=True):
