@@ -1,0 +1,48 @@
+{
+  "generatedAt": "12.10.2026 18:00",
+  "source": "BILLING_SERVICE",
+  "rentals": [
+    {
+      "id": 42,
+      "status": "LOST",
+      "startDate": "2026-10-10",
+      "endDate": "2026-10-12",
+      "car": {
+        "plateNumber": "AA12BB",
+        "color": "Зелений",
+        "mileage": -10,
+        "status": "AVAILABLE",
+        "model": {
+          "id": "M001",
+          "brand": "Lada",
+          "name": "Niva",
+          "year": 2028,
+          "engineType": "STEAM",
+          "transmission": "MANUAL",
+          "seats": 12,
+          "dailyRate": 0
+        }
+      },
+      "customer": {
+        "id": "C1",
+        "firstName": "   ",
+        "lastName": "Петренко",
+        "phoneNumber": "+380671234567",
+        "birthDate": "2012-05-05",
+        "driverLicense": "AXA123456",
+        "discountPercent": 45,
+        "vip": true
+      },
+      "extras": [
+        { "name": "GPS", "price": 200.00 },
+        { "name": "GPS", "price": 200.00 }
+      ],
+      "totalCost": 250.00,
+      "payment": {
+        "method": "CARD",
+        "receiptNumber": "RC-000001",
+        "paidAt": "2026-10-10T10:00:00Z"
+      }
+    }
+  ]
+}
